@@ -35,19 +35,19 @@ def classify(error):
     # 권한 오류
     # - 모델 접근 권한 없음
     # - 재시도로 해결되지 않음
-    if error.status==403:
+    elif status == 403:
         result = {"kind" : "permission_error", "retryable" : False}
         return result
     # 할당량 초과
     # - 결제 또는 사용량 한도 도달
     # - 재시도 중단
-    elif error.status==429 and codes & {"insufficient_quota", "billing_hard_limit_reached", "billing_not_active", "usage_limit_reached"}:
+    elif status == 429 and codes & {"insufficient_quota", "billing_hard_limit_reached", "billing_not_active", "usage_limit_reached"}:
         result = {"kind":"quota_error","retryable":False}
         return result
     # 일시적 요청 제한
     # - 속도 제한으로 인한 오류
     # - 일정 시간 후 재시도 가능
-    elif error.status==429 and codes & {"rate_limit_exceeded", "rate_limit_error", "requests","tokens"}:
+    elif status == 429 and codes & {"rate_limit_exceeded", "rate_limit_error", "requests","tokens"}:
         result = {"kind":"rate_limit","retryable":True}
         return result
         # result = {}  # quota이면중단, rate_limit_exceeded면제한 재시도
